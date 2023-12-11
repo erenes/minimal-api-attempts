@@ -1,4 +1,6 @@
-﻿public class ErrorResponseDto
+﻿namespace Api;
+
+public class ErrorResponseDto
 {
     /// <summary>
     /// Gets or sets the status code
