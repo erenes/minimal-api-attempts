@@ -30,5 +30,27 @@ namespace WebApplication7
 
             return app;
         }
+
+        public static IServiceCollection AddProblemDetailsWithErrorMessageDto(this IServiceCollection services)
+        {
+            services.AddProblemDetails(options =>
+            {
+                options.CustomizeProblemDetails = async (context) =>
+                {
+                    var dto = new ErrorResponseDto()
+                    {
+                        Status = context.HttpContext.Response.StatusCode,
+                    };
+                    dto.Errors.Add(new ErrorResponseDto.ErrorModel()
+                    {
+                        Message = ReasonPhrases.GetReasonPhrase(context.HttpContext.Response.StatusCode),
+                    });
+
+                    await context.HttpContext.Response.WriteAsJsonAsync(dto);
+                };
+            });
+
+            return services;
+        }
     }
 }

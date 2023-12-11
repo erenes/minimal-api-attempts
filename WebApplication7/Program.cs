@@ -33,7 +33,7 @@ static void ConfigureServices(WebApplicationBuilder builder)
         options.ThrowOnBadRequest = true;
     });
 
-    builder.Services.AddProblemDetails();
+    builder.Services.AddProblemDetailsWithErrorMessageDto();
 }
 
 static void ConfigurePipeline(WebApplication app)
