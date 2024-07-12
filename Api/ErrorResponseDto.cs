@@ -5,12 +5,12 @@ public class ErrorResponseDto
     /// <summary>
     /// Gets or sets the status code
     /// </summary>
-    public int Status { get; set; }
+    public required int Status { get; set; }
 
     /// <summary>
     /// Gets the collection of errors
     /// </summary>
-    public ICollection<ErrorModel> Errors { get; } = new List<ErrorModel>();
+    public required ICollection<ErrorModel> Errors { get; init; }
 
     /// <summary>
     /// An individual error
@@ -25,6 +25,6 @@ public class ErrorResponseDto
         /// <summary>
         /// Gets or sets a description of the error
         /// </summary>
-        public string Message { get; set; } = "An error occurred";
+        public required string Message { get; set; } = "An error occurred";
     }
 }

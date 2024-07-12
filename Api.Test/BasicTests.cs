@@ -28,20 +28,11 @@ public class BasicTests(WebApplicationFactory<Program> factory)
         // Arrange
         var client = factory.CreateClient();
 
-        HttpResponseMessage response;
-        try
-        {
-            // Act
-            response = await client.GetAsync("api/weatherforecast/1/hallo/error");
-        }
-        catch
-        {
-            Assert.Fail("Should not have thrown!?");
-            throw;
-        }
+        // Act
+        var response = await client.GetAsync("api/weatherforecast/1/hallo/error");
 
         // Assert
-        response.EnsureSuccessStatusCode();
+        Assert.False(response.IsSuccessStatusCode);
         Assert.Equal("application/json; charset=utf-8", response.Content.Headers.ContentType?.ToString());
     }
 }

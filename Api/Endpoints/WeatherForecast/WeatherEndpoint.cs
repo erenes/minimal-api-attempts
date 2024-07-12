@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 
-namespace Api.Endpoints;
+namespace Api.Endpoints.WeatherForecast;
 
 public class WeatherEndpoints : IEndpointBuilder
 {
@@ -44,10 +43,10 @@ public class WeatherEndpoints : IEndpointBuilder
         return app;
     }
 
-    private static Results<Ok<WeatherForecast[]>, NotFound> GetForecast(IConfiguration configuration, int test, int hoi)
+    private static Results<Ok<WeatherForecastDto[]>, NotFound> GetForecast(IConfiguration configuration, int test, int hoi)
     {
         var forecast = Enumerable.Range(1, 5).Select(index =>
-            new WeatherForecast
+            new WeatherForecastDto
             (
                 DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
                 Random.Shared.Next(-20, 55),
@@ -58,8 +57,8 @@ public class WeatherEndpoints : IEndpointBuilder
         return TypedResults.Ok(forecast);
     }
 
-    private static Results<Ok<WeatherForecast>, NotFound> PostForecast([FromBody] WeatherForecast weatherForecast, int test)
+    private static Results<Ok<WeatherForecastDto>, NotFound> PostForecast(FromBody<WeatherForecastDto> weatherForecast, int test)
     {
-        return TypedResults.Ok(weatherForecast);
+        return TypedResults.Ok<WeatherForecastDto>(weatherForecast);
     }
 }

@@ -4,6 +4,32 @@ namespace Api;
 
 public static class ApplicationBuilderExtensions
 {
+    public static IApplicationBuilder UseExceptions(this IApplicationBuilder app)
+    {
+        return app.Use(async (context, next) =>
+         {
+             try
+             {
+                 await next(context);
+             }
+             catch (Exception ex)
+             {
+                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                 await context.Response.WriteAsJsonAsync(new ErrorResponseDto()
+                 {
+                     Status = StatusCodes.Status500InternalServerError,
+                     Errors =
+                     [
+                         new()
+                         {
+                            Message = ex.Message,
+                         },
+                    ],
+                 });
+             }
+         });
+    }
+
     /// <summary>
     /// Configured the IApplicationBuilder to use the standard UseStatusCodePages but with a body according to ErrorResponseDto
     /// </summary>
@@ -16,11 +42,14 @@ public static class ApplicationBuilderExtensions
             var dto = new ErrorResponseDto()
             {
                 Status = context.HttpContext.Response.StatusCode,
+                Errors =
+                [
+                    new()
+                    {
+                        Message = ReasonPhrases.GetReasonPhrase(context.HttpContext.Response.StatusCode),
+                    }
+                ]
             };
-            dto.Errors.Add(new ErrorResponseDto.ErrorModel()
-            {
-                Message = ReasonPhrases.GetReasonPhrase(context.HttpContext.Response.StatusCode),
-            });
 
             await context.HttpContext.Response.WriteAsJsonAsync(dto);
         });
@@ -37,11 +66,14 @@ public static class ApplicationBuilderExtensions
                 var dto = new ErrorResponseDto()
                 {
                     Status = context.HttpContext.Response.StatusCode,
+                    Errors =
+                    [
+                        new()
+                        {
+                            Message = ReasonPhrases.GetReasonPhrase(context.HttpContext.Response.StatusCode),
+                        }
+                    ]
                 };
-                dto.Errors.Add(new ErrorResponseDto.ErrorModel()
-                {
-                    Message = ReasonPhrases.GetReasonPhrase(context.HttpContext.Response.StatusCode),
-                });
 
                 await context.HttpContext.Response.WriteAsJsonAsync(dto);
             };

@@ -1,5 +1,5 @@
-using Api.Endpoints;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Text.Json.Serialization;
+using Api.Endpoints.WeatherForecast;
 
 namespace Api;
 
@@ -25,15 +25,11 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
-        builder.Services.AddExceptionHandler<Handler>();
+        builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(o =>
+        {
+            o.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+        });
 
-        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-             .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, c =>
-             {
-                 c.Audience = "https://oyster";
-             });
-
-        builder.Services.AddAuthorization();
         builder.Services.Configure<RouteHandlerOptions>(options =>
         {
             options.ThrowOnBadRequest = true;
@@ -44,22 +40,7 @@ public class Program
 
     private static void ConfigurePipeline(WebApplication app)
     {
-        app.UseExceptionHandler(new ExceptionHandlerOptions()
-        {
-            AllowStatusCode404Response = true,
-        });
-
-        app.Use(async (context, next) =>
-        {
-            try
-            {
-                await next(context);
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-        });
+        app.UseExceptions();
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
@@ -72,17 +53,11 @@ public class Program
 
         app.UseStatusCodePageWithErrorMessageDto();
 
-        app.UseAuthentication();
-        app.UseAuthorization();
-
         var global = app
             .MapGroup("/api")
             .WithOpenApi();
-        // .RequireAuthorization();
 
         WeatherEndpoints.RegisterEndpoints(global);
-
-        var tm = typeof(WeatherEndpoints).GetProperties();
 
         app.MapWhen(context => context.Request.Method == HttpMethod.Get.Method && !context.Request.Path.StartsWithSegments("/api") && !context.Request.Path.StartsWithSegments("/connect"), appServer =>
         {
