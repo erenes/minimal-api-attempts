@@ -40,6 +40,11 @@ public class WeatherEndpoints : IEndpointBuilder
             .MapPost("/", PostForecast)
             .WithName(nameof(PostForecast));
 
+
+        group
+            .MapPut("/", PutForecast)
+            .WithName(nameof(PutForecast));
+
         return app;
     }
 
@@ -58,6 +63,11 @@ public class WeatherEndpoints : IEndpointBuilder
     }
 
     private static Results<Ok<WeatherForecastDto>, NotFound> PostForecast(FromBody<WeatherForecastDto> weatherForecast, int test)
+    {
+        return TypedResults.Ok<WeatherForecastDto>(weatherForecast);
+    }
+
+    private static Results<Ok<WeatherForecastDto>, NotFound> PutForecast(FromParse<WeatherForecastDto> weatherForecast, int test)
     {
         return TypedResults.Ok<WeatherForecastDto>(weatherForecast);
     }
